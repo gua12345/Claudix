@@ -18,28 +18,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 👇 新增的调试步骤：查看工作目录文件
+      # 👇 这个调试步骤暂时保留，等成功后可以删除
       - name: List working directory
         run: |
           echo "📁 Listing all files and folders in the root directory..."
           ls -la
-          echo "---"
-          echo "📁 Listing .github directory (if it exists)..."
-          ls -la .github/ || echo ".github directory not found!"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 9
 
+      # 👇 修改点1：完全移除了 'cache: pnpm' 这一行
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
 
+      # 👇 修改点2：移除了 --frozen-lockfile
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Build and Package Extension
         run: |
