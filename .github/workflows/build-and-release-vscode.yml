@@ -18,13 +18,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js and pnpm
+      # 👇 第一步：独立安装 pnpm，这是关键！
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9 # 使用明确的版本号
+
+      # 👇 第二步：安装 Node.js，并利用上一步的 pnpm 来设置缓存
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # 👍 这一行是核心，它告诉Actions同时安装和缓存pnpm
-          packageManager: 'pnpm@9'
+          cache: 'pnpm' # 现在它能找到 pnpm 了，所以缓存设置不会报错
 
+      # 👇 后续步骤保持不变
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
