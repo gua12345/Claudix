@@ -1,3 +1,5 @@
+# .github/workflows/build-and-release-vscode.yml
+
 name: Build and Release Claudix Extension
 
 on:
@@ -16,15 +18,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 👇 只需要一个setup步骤，同时处理好node和pnpm
       - name: Setup Node.js and pnpm
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # 👍 这是关键：告诉setup-node同时安装并缓存pnpm@9
+          # 👍 这一行是核心，它告诉Actions同时安装和缓存pnpm
           packageManager: 'pnpm@9'
 
-      # 👇 后续步骤保持不变
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
