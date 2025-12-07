@@ -1,0 +1,39 @@
+# .github/workflows/sync-master-and-trigger-build.yml
+name: Sync master and trigger build
+
+# 监听 master 分支的 push。
+# 当你点击 "Sync fork" 并成功同步到 master 分支后，这个工作流就会自动运行。
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write # 需要权限来 push 到 Auto-package 分支
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure Git User
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge master into Auto-package
+        run: |
+          # 切换到 Auto-package 分支
+          git checkout Auto-package
+          
+          # 将干净的上游代码合并进来
+          git merge origin/master --no-ff -m "chore(sync): Merge latest from master branch [skip ci]"
+          
+          # 推送更新后的 Auto-package 分支，这会触发下一个工作流
+          git push origin Auto-package
