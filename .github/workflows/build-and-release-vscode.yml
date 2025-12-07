@@ -1,7 +1,5 @@
-# .github/workflows/build-and-release-vscode.yml
 name: Build and Release Claudix Extension
 
-# 当 Auto-package 分支有 push 时 (包括上一步工作流推送的代码)，触发此构建
 on:
   push:
     branches:
@@ -18,17 +16,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      # 👇 只需要一个setup步骤，同时处理好node和pnpm
+      - name: Setup Node.js and pnpm
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
+          # 👍 这是关键：告诉setup-node同时安装并缓存pnpm@9
+          packageManager: 'pnpm@9'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-
+      # 👇 后续步骤保持不变
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
