@@ -18,20 +18,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 👇 第一步：独立安装 pnpm，这是关键！
+      # 👇 新增的调试步骤：查看工作目录文件
+      - name: List working directory
+        run: |
+          echo "📁 Listing all files and folders in the root directory..."
+          ls -la
+          echo "---"
+          echo "📁 Listing .github directory (if it exists)..."
+          ls -la .github/ || echo ".github directory not found!"
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 9 # 使用明确的版本号
+          version: 9
 
-      # 👇 第二步：安装 Node.js，并利用上一步的 pnpm 来设置缓存
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm' # 现在它能找到 pnpm 了，所以缓存设置不会报错
+          cache: 'pnpm'
 
-      # 👇 后续步骤保持不变
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
