@@ -1,0 +1,53 @@
+# .github/workflows/build-and-release-vscode.yml
+name: Build and Release Claudix Extension
+
+# 当 Auto-package 分支有 push 时 (包括上一步工作流推送的代码)，触发此构建
+on:
+  push:
+    branches:
+      - Auto-package
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and Package Extension
+        run: |
+          pnpm build
+          pnpm package
+
+      - name: Release Extension
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: build-${{ github.sha }}
+          name: Claudix Development Build ${{ github.sha }}
+          body: |
+            Automated build of Claudix VSCode extension.
+            - **Commit**: `${{ github.sha }}`
+            - **Message**: `${{ github.event.head_commit.message }}`
+          prerelease: true
+          files: |
+            *.vsix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
